@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TransactionATM</string>
+    <string name="balance_button">Balance</string>
+    <string name="deposit_button">Deposit</string>
+    <string name="withdraw_button">Withdraw</string>
+    <string name="exit_button">Exit</string>
+</resources>
