@@ -1,2 +1,2 @@
 # TransactionATM
-It is a test application with bank thransactions' functions
+It is a test application with bank transactions' functions
