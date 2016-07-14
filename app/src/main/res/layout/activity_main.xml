@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
+
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#CCCCCC77">
-
-       <!-- <EditText
-            android:id="@+id/url_field"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:lines="3" />
-        -->
+        android:background="#0000cccc"
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <Button
             android:id="@+id/balance_button"
-            android:layout_width="wrap_content"
+            android:layout_width="125dip"
             android:layout_height="wrap_content"
             android:text="@string/balance_button" />
         <Button
             android:id="@+id/deposit_button"
-            android:layout_width="wrap_content"
+            android:layout_width="125dip"
             android:layout_height="wrap_content"
             android:text="@string/deposit_button" />
         <Button
             android:id="@+id/withdraw_button"
-            android:layout_width="wrap_content"
+            android:layout_width="125dip"
             android:layout_height="wrap_content"
             android:text="@string/withdraw_button" />
         <Button
             android:id="@+id/exit_button"
-            android:layout_width="wrap_content"
+            android:layout_width="125dip"
             android:layout_height="wrap_content"
             android:text="@string/exit_button" />
+
+        <EditText
+            android:id="@+id/editTextResult"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:lines="3"
+            android:padding="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:title="Result" />
+
     </LinearLayout>

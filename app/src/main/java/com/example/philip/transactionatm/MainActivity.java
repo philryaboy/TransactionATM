@@ -1,42 +1,42 @@
 package com.example.philip.transactionatm;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
-import java.util.Scanner;
+
 import java.text.DecimalFormat;
 
 public class MainActivity extends Activity {
 
-    //private EditText urlText;
-
-    private static double currentBal = 54321;
-
+    static final int max_amount_for_client = 1000;
     static int notes_200 = 3, notes_100 = 2, notes_50 = 4, notes_20 = 3, notes_10 = 49, notes_5 = 23, notes_1 = 10;
 
     static int given_notes_200 = 0, given_notes_100 = 0, given_notes_50 = 0, given_notes_20 = 0, given_notes_10 = 0,
             given_notes_5 = 0, given_notes_1 = 0;
-
-    static final int max_amount_for_client = 1000;
-
     static int amount_in_dispenser = notes_200 * 200 + notes_100 * 100 + notes_50 * 50 + notes_20 * 20 +
             notes_10 * 10 + notes_5 * 5 + notes_1;
-
+    static int money = 0;
+    private static double currentBal = 5000;
+    String moneyS = "";
+    private EditText result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //urlText = (EditText) findViewById(R.id.url_field);
-
         Button balanceButton = (Button) findViewById(R.id.balance_button);
         Button depositButton = (Button) findViewById(R.id.deposit_button);
         Button withdrawButton = (Button) findViewById(R.id.withdraw_button);
         Button exitButton =  (Button) findViewById(R.id.exit_button);
+
+        result = (EditText) findViewById(R.id.editTextResult);
 
         // Setup event handlers
         balanceButton.setOnClickListener(new OnClickListener() {
@@ -47,13 +47,15 @@ public class MainActivity extends Activity {
 
         depositButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                depositFounds();
+                //depositFounds();
+                showInputDialogDeposit();
             }
         });
 
         withdrawButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
-                withdrawFunds();
+                //withdrawFunds();
+                showInputDialogWithdraw();
             }
         });
 
@@ -63,171 +65,208 @@ public class MainActivity extends Activity {
             }
         });
     }
-    public static void viewBalance() {
-        DecimalFormat money = new DecimalFormat ("$#,##0.00");
-        System.out.println("\t-- The current balance is: $" + currentBal);
+
+    protected void showInputDialogWithdraw() {
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.prompt, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.amount);
+
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        moneyS = editText.getText().toString();
+                        if (!moneyS.equals("")) {
+                            money = Integer.parseInt(moneyS);
+                            withdrawFunds();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 
-    public static double withdrawFunds() {
-        Scanner scanner = new Scanner(System.in);
+    protected void showInputDialogDeposit() {
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.prompt, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.amount);
+
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        moneyS = editText.getText().toString();
+                        if (!moneyS.equals("")) {
+                            money = Integer.parseInt(moneyS);
+                            depositFounds();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
+    public void viewBalance() {
+        DecimalFormat money = new DecimalFormat ("$#,##0.00");
+        result.setText("The current balance is: $" + currentBal);
+    }
+
+    public void withdrawFunds() {
         int withdrawMoney = 0;
+        withdrawMoney = money;
 
-        //while(!scanner.hasNextInt()){}
-        //withdrawMoney = scanner.nextInt();
-
-        withdrawMoney = 756;  //TEST
-
-        System.out.println("Amount to withdraw: " + withdrawMoney);
+        if (withdrawMoney > max_amount_for_client) {
+            result.setText("The amount to withdraw is more than allowed - " + max_amount_for_client);
+            return;
+        }
 
         if(currentBal >= withdrawMoney){
-            currentBal = currentBal - withdrawMoney;
+            currentBal -= withdrawMoney;
+            result.setText("Amount to withdraw: $" + withdrawMoney + "\nThe balance is: $" + currentBal +
+                    "\nPlease, take your cash");
             dispenser(withdrawMoney);
         }
         else{
-            System.out.println("Not enough money on your account");
+            result.setText("Not enough money on your account");
         }
-        return currentBal;
     }
 
-    public static double depositFounds() {
-        Scanner scanner = new Scanner(System.in);
+    public void depositFounds() {
         int addMoney = 0;
-
-        //while(!scanner.hasNextInt()){}
-        //addMoney = scanner.nextInt();
-
-        addMoney = 1500; // TEST
-
-        System.out.println("Amount to deposit: " + addMoney);
-        currentBal = currentBal + addMoney;
-        return currentBal;
+        addMoney = money;
+        currentBal += addMoney;
+        result.setText("Amount to deposit: $" + addMoney + "\nThe balance is: $" + currentBal);
     }
 
-    public static void exitProgram(){
-        DecimalFormat money = new DecimalFormat ("$#,##0.00");
-        System.out.println("The balance is: $" + currentBal);
-        System.out.println("Bye! \n");
+    public void exitProgram() {
         System.exit(0);
     }
 
 
-    public static void dispenser(int amount){
-        int result = 0, remain = 0;
+    public void dispenser(int amount) {
+
+        int calcResult = 0;
+
         if(amount <= max_amount_for_client && amount <= amount_in_dispenser){
             if(amount == 200){
                 given_notes_200 = 1;
                 notes_200 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 200){
-                result  = amount/200;
+                calcResult = amount / 200;
                 amount  = amount%200;
-                given_notes_200 = result;
-                notes_200 -= result;
+                given_notes_200 = calcResult;
+                notes_200 -= calcResult;
             }
 
             if(amount == 100){
                 given_notes_100 = 1;
                 notes_100 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 100){
-                result  = amount/100;
+                calcResult = amount / 100;
                 amount  = amount%100;
-                given_notes_100 = result;
-                notes_100 -= result;
+                given_notes_100 = calcResult;
+                notes_100 -= calcResult;
             }
 
             if(amount == 50){
                 given_notes_50 = 1;
                 notes_50 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 50){
-                result  = amount/50;
+                calcResult = amount / 50;
                 amount  = amount%50;
-                given_notes_50 = result;
-                notes_50 -= result;
+                given_notes_50 = calcResult;
+                notes_50 -= calcResult;
             }
 
             if(amount == 20){
                 given_notes_20 = 1;
                 notes_20 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 20){
-                result  = amount/20;
+                calcResult = amount / 20;
                 amount  = amount%20;
-                given_notes_20 = result;
-                notes_20 -= result;
+                given_notes_20 = calcResult;
+                notes_20 -= calcResult;
             }
 
             if(amount == 10){
                 given_notes_10 = 1;
                 notes_10 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 10){
-                result  = amount/10;
+                calcResult = amount / 10;
                 amount  = amount%10;
-                given_notes_10 = result;
-                notes_10 -= result;
+                given_notes_10 = calcResult;
+                notes_10 -= calcResult;
             }
 
             if(amount == 5){
                 given_notes_5 = 1;
                 notes_5 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 5){
-                result  = amount/5;
+                calcResult = amount / 5;
                 amount  = amount%5;
-                given_notes_5 = result;
-                notes_5 -= result;
+                given_notes_5 = calcResult;
+                notes_5 -= calcResult;
             }
 
             if(amount == 1){
                 given_notes_1 = 1;
                 notes_1 -= 1;
-                giveCash();
+                // startDispenser();
                 return;
             }
 
             if(amount > 1){
-                result  = amount/1;
+                calcResult = amount / 1;
                 amount  = amount%1;
-                given_notes_1 = result;
-                notes_1 -= result;
-                giveCash();
+                given_notes_1 = calcResult;
+                notes_1 -= calcResult;
+                // startDispenser();
                 return;
             }
-        }
-
-        if(amount > amount_in_dispenser){
-            System.out.println("Not enough cash in dispenser");
-            return;
-        }
-
-        if(amount > max_amount_for_client){
-            System.out.println("The amount is too big");
-            return;
-        }
-    }
-
-    public static void giveCash(){
-        // startDispenser();
-        System.out.println("Please take your cash.");
+        } else if (amount > amount_in_dispenser)
+            result.setText("Not enough cash in dispenser");
     }
 }
+
